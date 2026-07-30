@@ -15,3 +15,5 @@ fuzzer/build
 fuzzer/*.yaml
 outputs
 .txt
+docker-smoke-out*/
+CLAUDE.MD

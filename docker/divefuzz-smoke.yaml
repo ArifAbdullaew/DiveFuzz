@@ -1,0 +1,38 @@
+# Docker-safe DiveFuzz configuration used by docker/smoke-test.sh.
+#
+# Every path is a stable in-container path; there are no host-specific absolute
+# paths. The DUT here is the smoke fixture, not a CPU model — see
+# docker/smoke-dut/emu.
+
+dut_target:
+- name: "DiveFuzz Docker smoke DUT"
+  threads: 2
+  version: smoke-fixture
+  # No differential reference: the fixture does not implement one.
+  diff_ref: None
+  # Working directory the DUT command is launched from.
+  emu_path: /opt/DiveFuzz/docker/smoke-dut
+  # `$1` is replaced by dut_executor.py with the generated seed path.
+  # `./emu` is relative on purpose: it only resolves if cwd == emu_path.
+  cmd: ./emu -i $1
+
+seeds:
+- name: smoke
+  input: divefuzz
+  divefuzz:
+    # NOTE: gen_only is parsed by config/dut_config.py but is not referenced
+    # anywhere in the execution path, so it does NOT skip DUT execution.
+    gen_only: false
+    threads: 2
+    # Diversification via spike_engine — DiveFuzz's core behaviour, so the
+    # default smoke run exercises it. docker/smoke-test.sh --no-dive runs the
+    # same config with dive_enable: false.
+    dive_enable: true
+    mode: generate
+    # Mounted, persistent location.
+    seeds_output: /work/seeds
+    seeds_num: 2
+    ins_num: 20
+    is_cva6: false
+    is_rv32: false
+    template_type: 'xiangshan'

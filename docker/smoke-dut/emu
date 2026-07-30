@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Minimal deterministic smoke DUT fixture.
+#
+# THIS IS NOT A CPU MODEL AND PERFORMS NO CORRECTNESS CHECKING.
+# It exists only to validate the container plumbing end to end:
+#   - that dut_executor.py substituted `$1` with a real seed path,
+#   - that the command ran with cwd == dut_target.emu_path (it is invoked as
+#     the relative path ./emu, which only resolves if cwd is correct),
+#   - that the produced seed image is readable and non-empty.
+#
+# Exit codes mirror what dut_executor.py interprets:
+#   0 -> ResultType.SUCCESS, non-zero -> ResultType.FAILURE
+set -uo pipefail
+
+seed=""
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -i)
+            seed="${2:-}"
+            shift 2
+            ;;
+        *)
+            # Ignore extra flags so this fixture can stand in for a real DUT
+            # command line (e.g. --diff <so>) without changes.
+            shift
+            ;;
+    esac
+done
+
+echo "smoke-dut: cwd=$(pwd)"
+echo "smoke-dut: seed=${seed}"
+
+if [ -z "${seed}" ]; then
+    echo "smoke-dut: ERROR no seed passed (\$1 substitution failed)" >&2
+    exit 2
+fi
+
+if [ ! -f "${seed}" ]; then
+    echo "smoke-dut: ERROR seed file does not exist: ${seed}" >&2
+    exit 3
+fi
+
+if [ ! -s "${seed}" ]; then
+    echo "smoke-dut: ERROR seed file is empty: ${seed}" >&2
+    exit 4
+fi
+
+size=$(wc -c < "${seed}" | tr -d ' ')
+echo "smoke-dut: seed size=${size} bytes"
+echo "smoke-dut: OK"
+exit 0

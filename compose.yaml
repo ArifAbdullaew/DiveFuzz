@@ -1,0 +1,33 @@
+# Convenience wrapper around the DiveFuzz core image.
+#
+# It exists mainly to keep the /work mount and the external-DUT mount in one
+# place instead of repeating long `docker run -v` lines.
+#
+#   docker compose build
+#   docker compose run --rm smoke          # end-to-end smoke test
+#   docker compose run --rm divefuzz --config /work/my_test.yaml
+
+services:
+  divefuzz:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: divefuzz:latest
+    volumes:
+      # Persistent working directory: generated seeds land in /work/seeds and
+      # run_dut.py writes its relative `outputs` directory to /work/outputs.
+      - ./docker-smoke-out:/work
+      # External DUT: uncomment and point at a real, already-built DUT tree.
+      # The container path below is what `emu_path` in your YAML must use.
+      # - /absolute/host/path/to/XiangShan:/dut/XiangShan:ro
+    command: ["--help"]
+
+  smoke:
+    extends:
+      service: divefuzz
+    command: ["smoke"]
+
+  probe:
+    extends:
+      service: divefuzz
+    command: ["probe"]

@@ -40,5 +40,7 @@ def main():
         return 1
 
 if __name__ == "__main__":
-    # sys.exit(main())
-    main()
+    # main() already returns 1 for an unusable config; propagate it so callers
+    # (CI, scripts, containers) can detect the failure. A successful run returns
+    # None, which sys.exit treats as exit code 0.
+    sys.exit(main())

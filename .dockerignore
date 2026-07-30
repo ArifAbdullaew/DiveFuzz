@@ -1,0 +1,47 @@
+# Git metadata. The build context relies on submodule *working trees* being
+# present on disk (see docker/build.sh), not on Git history, so excluding .git
+# is safe and keeps the context small.
+.git
+.gitignore
+.gitmodules
+
+# Real DUT submodules are intentionally NOT baked into the default image.
+# Mount a real DUT at runtime instead (see README "External DUT").
+dut/
+
+# The reference (non-adapter) Spike checkout is not required by the image.
+ref/riscv-isa-sim/
+
+# Generated seeds, logs and local build artifacts
+outputs/
+fuzzer/outputs/
+fuzzer/out*
+fuzzer/build/
+fuzzer/bug-file/
+fuzzer/spike_resolution/
+fuzzer/generator/out*
+fuzzer/generator/spike_resolution/
+fuzzer/generator/xor_values/
+ref/riscv-isa-sim-adapter/build/
+ref/riscv-isa-sim-adapter/spike_engine/*.so
+ref/riscv-isa-sim-adapter/spike_engine/*.o
+
+# Local user configs (fuzzer/*.yaml is gitignored upstream)
+fuzzer/*.yaml
+
+# Caches / virtualenvs / editor state
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+.venv/
+venv/
+.vscode/
+.idea/
+.DS_Store
+
+# Docs and meta that do not affect the build
+CLAUDE.md
+LICENSE
+
+# Local smoke-test output
+docker-smoke-out*/

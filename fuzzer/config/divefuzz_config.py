@@ -51,3 +51,12 @@ class DiveFuzzArgConfig:
     debug_all: bool = False
     debug_no_csr: bool = False
     debug_no_fpr: bool = False
+
+    # Feature toggles read unconditionally by generator/config/config_manager.py.
+    # Without them the run_dut.py --config path raises AttributeError before any
+    # seed is generated. Defaults mirror the standalone generator CLI
+    # (--no-stateful-xor-cache / --no-bug-filter / --no-jump in
+    # generator/config/cli_parser.py all default to enabled).
+    stateful_xor_cache: bool = True
+    bug_filter_enable: bool = True
+    jump_enable: bool = True
